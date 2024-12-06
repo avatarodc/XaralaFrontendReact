@@ -1,23 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTransactions } from '../../hooks/useTransactions';
 import { getColumns } from './columns.jsx';
 import TransactionForm from '../TransactionForm';
 import SuccessModal from '../TransactionForm/SuccessModal';
 import DeleteConfirmationModal from '../TransactionForm/DeleteConfirmationModal';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const TransactionList = () => {
-    const [isModalVisible, setIsModalVisible] = React.useState(false);
-    const [editingTransaction, setEditingTransaction] = React.useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [editingTransaction, setEditingTransaction] = useState(null);
     const { transactions, balance, loading, fetchTransactions, deleteTransaction } = useTransactions();
-    const [successModal, setSuccessModal] = React.useState({
+    const [successModal, setSuccessModal] = useState({
         isOpen: false,
         type: 'success',
         mode: 'create'
     });
-    const [deleteModal, setDeleteModal] = React.useState({
+    const [deleteModal, setDeleteModal] = useState({
         isOpen: false,
         transaction: null
     });
+
+    // États pour la pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
 
     React.useEffect(() => {
         fetchTransactions();
@@ -69,6 +74,30 @@ const TransactionList = () => {
                 mode: 'delete'
             });
         }
+    };
+
+    // Calcul pour la pagination
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentTransactions = transactions.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(transactions.length / itemsPerPage);
+
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+    }
+
+    // Navigation entre les pages
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const handlePreviousPage = () => {
+        setCurrentPage((prev) => Math.max(prev - 1, 1));
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
     };
 
     const columns = getColumns(handleEdit, handleDeleteClick);
@@ -145,14 +174,14 @@ const TransactionList = () => {
                                         Chargement...
                                     </td>
                                 </tr>
-                            ) : transactions.length === 0 ? (
+                            ) : currentTransactions.length === 0 ? (
                                 <tr>
                                     <td colSpan={columns.length} className="px-6 py-4 text-center text-gray-500">
                                         Aucune transaction trouvée
                                     </td>
                                 </tr>
                             ) : (
-                                transactions.map(transaction => (
+                                currentTransactions.map(transaction => (
                                     <tr key={transaction.id} className="hover:bg-gray-50">
                                         {columns.map(column => (
                                             <td
@@ -173,6 +202,46 @@ const TransactionList = () => {
                     </table>
                 </div>
             </div>
+
+            {/* Pagination */}
+            {!loading && transactions.length > 0 && (
+                <div className="px-6 py-4 border-t border-gray-200">
+                    <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-500">
+                            Affichage {indexOfFirstItem + 1} à {Math.min(indexOfLastItem, transactions.length)} sur {transactions.length} transactions
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <button
+                                onClick={handlePreviousPage}
+                                disabled={currentPage === 1}
+                                className="p-2 rounded-md border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            {pageNumbers.map((number) => (
+                                <button
+                                    key={number}
+                                    onClick={() => handlePageChange(number)}
+                                    className={`px-3 py-1 rounded-md ${
+                                        currentPage === number
+                                            ? 'bg-indigo-600 text-white'
+                                            : 'border border-gray-300 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    {number}
+                                </button>
+                            ))}
+                            <button
+                                onClick={handleNextPage}
+                                disabled={currentPage === totalPages}
+                                className="p-2 rounded-md border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Transaction Form Modal */}
             <TransactionForm
