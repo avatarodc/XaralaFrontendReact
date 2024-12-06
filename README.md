@@ -1,9 +1,40 @@
-# Gestion Budget
+Voici le fichier README.md pour le frontend React :
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Frontend (React)
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-# XaralaFrontendReact
+
+## Installation et démarrage
+ Installez les dépendances :
+
+```
+npm install
+```
+ Démarrez l'application React :
+
+```
+npm run dev
+```
+
+Le frontend sera accessible à l'adresse `http://localhost:5173/`.
+
+## Configuration
+
+## Structure du projet
+
+- `src/components` : Contient les composants React
+- `src/hooks` : Contient les hooks personnalisés
+- `src/pages` : Contient les pages de l'application
+- `src/utils` : Contient les fonctions utilitaires
+- `package.json` : Fichier de configuration npm
+
+## Dépendances
+
+Le projet frontend utilise les dépendances suivantes :
+
+- `react` et `react-dom` : Bibliothèque React
+- `axios` : Pour les requêtes HTTP
+- `moment` : Pour la manipulation des dates
+- `lucide-react` : Bibliothèque d'icônes
+- `antd` : Bibliothèque d'interface utilisateur
+- Diverses dépendances de développement comme `vite`, `eslint`, etc.
